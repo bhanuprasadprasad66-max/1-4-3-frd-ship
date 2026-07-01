@@ -1,4 +1,3 @@
-// Friend data with shortcodes
 const friends = [
     { name: 'HINDHU', shortCode: 'H' },
     { name: 'mouni', shortCode: 'M' },
@@ -40,7 +39,7 @@ function initApp() {
                     </div>
                 </div>
                 
-                <button class="btn btn-primary" onclick="nextStep()">Next</button>
+                <button class="btn btn-primary" onclick="nextStep()">Next ➜</button>
             </div>
 
             <div id="screen-2" class="screen">
@@ -52,7 +51,7 @@ function initApp() {
                     <input type="text" id="userName" placeholder="Enter your name">
                 </div>
                 
-                <button class="btn btn-primary" onclick="nextStep()">Next</button>
+                <button class="btn btn-primary" onclick="nextStep()">Next ➜</button>
             </div>
 
             <div id="screen-3" class="screen">
@@ -64,16 +63,17 @@ function initApp() {
                     <button class="no" onclick="selectYesNo('no')">NO ✗</button>
                 </div>
                 
-                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn3" disabled>Next</button>
+                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn3" disabled>Next ➜</button>
             </div>
 
             <div id="screen-4" class="screen">
                 <h1>💕 Love Proposal 💕</h1>
                 <h2>Select Your Best Friend</h2>
                 
+                <div id="permissionMsg"></div>
                 <div class="friend-list" id="friendList"></div>
                 
-                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn4" disabled>Next</button>
+                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn4" disabled>Next ➜</button>
             </div>
 
             <div id="screen-5" class="screen">
@@ -82,7 +82,7 @@ function initApp() {
                 
                 <div class="duration-options" id="durationList"></div>
                 
-                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn5" disabled>Next</button>
+                <button class="btn btn-primary" onclick="nextStep()" id="nextBtn5" disabled>Next ➜</button>
             </div>
 
             <div id="screen-6" class="screen">
@@ -110,18 +110,16 @@ function initApp() {
                 </div>
 
                 <button class="btn btn-primary" onclick="shareProposal()">❤️ Share This Love ❤️</button>
-                <button class="btn btn-secondary" onclick="restart()">Start Over</button>
+                <button class="btn btn-secondary" onclick="restart()">🔄 Start Over</button>
             </div>
         </div>
     `;
 
-    // Add event listeners
     document.getElementById('photo').addEventListener('change', handlePhotoUpload);
     document.getElementById('userName').addEventListener('keyup', function(e) {
         if (e.key === 'Enter') nextStep();
     });
 
-    // Populate friend list
     const friendListDiv = document.getElementById('friendList');
     friends.forEach(friend => {
         const div = document.createElement('div');
@@ -131,14 +129,12 @@ function initApp() {
         friendListDiv.appendChild(div);
     });
 
-    // Add MR.BHANU option
     const bhanDiv = document.createElement('div');
     bhanDiv.className = 'friend-option';
     bhanDiv.innerHTML = `<span>${bhanu.name}</span>`;
     bhanDiv.onclick = () => selectBhanu();
     friendListDiv.appendChild(bhanDiv);
 
-    // Populate duration list
     const durationListDiv = document.getElementById('durationList');
     durations.forEach(duration => {
         const div = document.createElement('div');
@@ -165,7 +161,6 @@ function handlePhotoUpload(e) {
 function selectYesNo(answer) {
     userData.isAkki = answer === 'yes';
     
-    // Update button styles
     document.querySelectorAll('.yes-no-group button').forEach(btn => {
         btn.style.background = 'white';
         btn.style.color = btn.classList.contains('yes') ? '#28a745' : '#dc3545';
@@ -185,35 +180,9 @@ function selectYesNo(answer) {
 function selectFriend(friend) {
     userData.bestFriend = friend;
     
-    // Update UI
     document.querySelectorAll('.friend-option').forEach((option, index) => {
-        if (index < friends.length) {
-            option.classList.remove('selected');
-            if (option.textContent.includes(friend.name)) {
-                option.classList.add('selected');
-            }
-        }
-    });
-    
-    document.getElementById('nextBtn4').disabled = false;
-}
-
-function selectBhanu() {
-    // Permission granted message
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'permission-granted';
-    messageDiv.textContent = '✓ PERMISSION GRANTED ✓';
-    
-    const friendListDiv = document.getElementById('friendList');
-    const existingMessage = friendListDiv.parentElement.querySelector('.permission-granted');
-    if (existingMessage) existingMessage.remove();
-    
-    friendListDiv.parentElement.insertBefore(messageDiv, friendListDiv);
-    
-    // Highlight MR.BHANU
-    document.querySelectorAll('.friend-option').forEach(option => {
         option.classList.remove('selected');
-        if (option.textContent.includes('MR.BHANU')) {
+        if (option.textContent.includes(friend.name)) {
             option.classList.add('selected');
         }
     });
@@ -221,10 +190,24 @@ function selectBhanu() {
     document.getElementById('nextBtn4').disabled = false;
 }
 
+function selectBhanu() {
+    const messageDiv = document.getElementById('permissionMsg');
+    messageDiv.innerHTML = '<div class="permission-granted">✓ PERMISSION GRANTED ✓</div>';
+    
+    document.querySelectorAll('.friend-option').forEach(option => {
+        option.classList.remove('selected');
+        if (option.textContent.includes('MR.BHANU')) {
+            option.classList.add('selected');
+        }
+    });
+    
+    userData.bestFriend = bhanu;
+    document.getElementById('nextBtn4').disabled = false;
+}
+
 function selectDuration(duration) {
     userData.duration = duration;
     
-    // Update UI
     document.querySelectorAll('.duration-option').forEach(option => {
         option.classList.remove('selected');
         if (option.textContent === duration.label) {
@@ -236,7 +219,6 @@ function selectDuration(duration) {
 }
 
 function nextStep() {
-    // Validate current step
     if (currentStep === 1 && !userData.photo) {
         alert('Please upload a photo!');
         return;
@@ -262,13 +244,11 @@ function nextStep() {
         return;
     }
 
-    // Move to next screen
     if (currentStep < 6) {
         document.getElementById(`screen-${currentStep}`).classList.remove('active');
         currentStep++;
         document.getElementById(`screen-${currentStep}`).classList.add('active');
 
-        // Show 3D animation on final screen
         if (currentStep === 6) {
             showFinalScreen();
         }
@@ -276,12 +256,10 @@ function nextStep() {
 }
 
 function showFinalScreen() {
-    // Display friend info
     document.getElementById('selectedFriendName').textContent = userData.bestFriend.name.toUpperCase();
     document.getElementById('selectedFriendCode').textContent = userData.bestFriend.shortCode;
     document.getElementById('selectedDuration').textContent = `Friends for ${userData.duration.label}`;
 
-    // Create 3D animation
     create3DAnimation();
 }
 
@@ -295,14 +273,13 @@ function create3DAnimation() {
     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
     camera.position.z = 3;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.shadowMap.enabled = true;
     container.appendChild(renderer.domElement);
 
-    // Create hearts
     const heartGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
-    const heartMaterial = new THREE.MeshStandardMaterial({ color: 0xff1493, emissive: 0xff69b4 });
+    const heartMaterial = new THREE.MeshStandardMaterial({ color: 0xff1493, emissive: 0xff69b4, metalness: 0.3, roughness: 0.4 });
 
     const hearts = [];
     for (let i = 0; i < 5; i++) {
@@ -315,11 +292,10 @@ function create3DAnimation() {
             mesh: heart,
             rotationSpeed: Math.random() * 0.05,
             floatSpeed: Math.random() * 0.02,
-            floatRange: Math.random() * 0.5
+            initialY: heart.position.y
         });
     }
 
-    // Create TEA text with THREE
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 512;
@@ -328,16 +304,15 @@ function create3DAnimation() {
     ctx.font = 'bold 200px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('🍵 TEA 🍵', 256, 256);
+    ctx.fillText('🍵', 256, 256);
 
     const texture = new THREE.CanvasTexture(canvas);
-    const textGeometry = new THREE.PlaneGeometry(3, 3);
+    const textGeometry = new THREE.PlaneGeometry(2, 2);
     const textMaterial = new THREE.MeshBasicMaterial({ map: texture });
     const textMesh = new THREE.Mesh(textGeometry, textMaterial);
     textMesh.position.z = -0.5;
     scene.add(textMesh);
 
-    // Add lighting
     const light = new THREE.PointLight(0xffffff, 1, 100);
     light.position.set(5, 5, 5);
     scene.add(light);
@@ -345,18 +320,15 @@ function create3DAnimation() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
 
-    // Animation loop
+    let animationId;
+
     function animate() {
-        requestAnimationFrame(animate);
+        animationId = requestAnimationFrame(animate);
 
         hearts.forEach(heart => {
             heart.mesh.rotation.x += heart.rotationSpeed;
             heart.mesh.rotation.y += heart.rotationSpeed;
-            heart.mesh.position.y += heart.floatSpeed;
-
-            if (heart.mesh.position.y > 3) {
-                heart.mesh.position.y = -3;
-            }
+            heart.mesh.position.y = heart.initialY + Math.sin(Date.now() * 0.001) * 0.5;
         });
 
         textMesh.rotation.z += 0.01;
@@ -366,8 +338,7 @@ function create3DAnimation() {
 
     animate();
 
-    // Handle window resize
-    window.addEventListener('resize', () => {
+    const resizeHandler = () => {
         if (container && container.parentElement) {
             const width = container.clientWidth;
             const height = container.clientHeight;
@@ -375,7 +346,9 @@ function create3DAnimation() {
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
         }
-    });
+    };
+
+    window.addEventListener('resize', resizeHandler);
 }
 
 function shareProposal() {
@@ -387,7 +360,7 @@ function shareProposal() {
             text: message
         }).catch(err => console.log('Error sharing:', err));
     } else {
-        alert(message);
+        alert(message + '\n\nCopy this and share with your bestie!');
     }
 }
 
@@ -403,5 +376,4 @@ function restart() {
     initApp();
 }
 
-// Initialize app on load
 window.addEventListener('DOMContentLoaded', initApp);
